@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Redline — find the risky clauses before you sign</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">R</span>
+      <div>
+        <h1>Redline</h1>
+        <p class="tagline">Find the risky clauses in a client contract — before you sign.</p>
+      </div>
+    </div>
+    <span class="local-badge"><span class="dot" aria-hidden="true"></span> Runs on your machine</span>
+  </header>
+
+  <main class="layout">
+    <section class="panel input-panel">
+      <div class="panel-head">
+        <h2>Paste the contract</h2>
+        <div class="row">
+          <button id="sample" class="btn ghost" type="button">Load a sample</button>
+          <button id="clear" class="btn ghost" type="button">Clear</button>
+        </div>
+      </div>
+      <label class="visually-hidden" for="contract">Contract text</label>
+      <textarea id="contract" spellcheck="false"
+        placeholder="Paste the full contract text here. It never leaves this computer."></textarea>
+      <div class="actions">
+        <button id="analyze" class="btn primary" type="button">Analyse contract</button>
+        <label class="checkbox">
+          <input type="checkbox" id="want-email" /> Draft a negotiation email
+        </label>
+      </div>
+      <p class="hint" id="status" role="status"></p>
+    </section>
+
+    <section class="panel result-panel">
+      <div id="empty" class="empty">
+        <h2>Nothing analysed yet</h2>
+        <p>
+          Your report appears here: every clause that is risky or unfair to you,
+          why it matters, and what to ask for instead.
+        </p>
+      </div>
+
+      <div id="result" hidden>
+        <div class="score" id="score"></div>
+        <p class="summary" id="summary"></p>
+        <div class="counts" id="counts"></div>
+        <div id="warnings"></div>
+        <ol class="findings" id="findings"></ol>
+
+        <div id="email-block" hidden>
+          <h2>Draft negotiation email</h2>
+          <pre id="email"></pre>
+          <button class="btn ghost" id="copy-email" type="button">Copy</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Redline runs an open-weight model locally through Ollama. No account, no API key, no upload.</p>
+    <p class="disclaimer">
+      Redline is not a lawyer, and this is not legal advice. It flags clauses worth a conversation.
+    </p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
