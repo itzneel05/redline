@@ -70,6 +70,9 @@ redline-web
 
 Pass `--model` if you pulled something other than the default, e.g. `redline-web --model gemma3:1b`.
 
+The report is the contract itself: each finding is written in the margin beside the clause that
+triggered it, with the exact words underlined the way you would mark a printed page.
+
 ## See it work without a model
 
 The built-in checks run with no model at all, so you can try Redline immediately:
@@ -83,7 +86,7 @@ redline samples/unfair-contract.txt --offline
 
 **Overall risk: HIGH** (9 high, 4 medium, 1 low)
 
-Found 14 clause(s) worth a second look: 9 high, 4 medium, 1 low.
+Found 14 clauses worth a second look.
 
 ## 1. 🔴 Broad IP assignment / work for hire  _(high · IP)_
 

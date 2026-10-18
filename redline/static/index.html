@@ -4,71 +4,82 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Redline — find the risky clauses before you sign</title>
+  <meta name="description" content="Redline reads a client contract and marks the clauses that are risky or unfair to a freelancer. It runs on this machine; nothing is uploaded." />
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-  <header class="masthead">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">R</span>
-      <div>
-        <h1>Redline</h1>
-        <p class="tagline">Find the risky clauses in a client contract — before you sign.</p>
-      </div>
-    </div>
-    <span class="local-badge"><span class="dot" aria-hidden="true"></span> Runs on your machine</span>
+  <a class="skip" href="#contract">Skip to the contract</a>
+
+  <header class="topbar">
+    <p class="wordmark">Redline</p>
+    <p class="promise">Runs on this machine. Nothing is uploaded.</p>
   </header>
 
-  <main class="layout">
-    <section class="panel input-panel">
-      <div class="panel-head">
-        <h2>Paste the contract</h2>
-        <div class="row">
-          <button id="sample" class="btn ghost" type="button">Load a sample</button>
-          <button id="clear" class="btn ghost" type="button">Clear</button>
-        </div>
-      </div>
-      <label class="visually-hidden" for="contract">Contract text</label>
+  <main>
+    <section class="intake" aria-labelledby="intake-title">
+      <h1 id="intake-title">Paste a client contract. See what it asks of you.</h1>
+      <p class="lede">
+        Redline reads it and marks the clauses that are risky or unfair to you, in the margin beside
+        the words that triggered them, with the wording to ask for instead.
+      </p>
+
+      <label class="field" for="contract">
+        <span class="field-label">The contract</span>
+      </label>
       <textarea id="contract" spellcheck="false"
-        placeholder="Paste the full contract text here. It never leaves this computer."></textarea>
-      <div class="actions">
-        <button id="analyze" class="btn primary" type="button">Analyse contract</button>
-        <label class="checkbox">
-          <input type="checkbox" id="want-email" /> Draft a negotiation email
+        placeholder="Paste the whole contract here. It stays on this computer."></textarea>
+
+      <div class="intake-actions">
+        <button id="analyze" class="button" type="button">Analyse contract</button>
+        <label class="check">
+          <input type="checkbox" id="want-email" /> Also draft a note to the client
         </label>
+        <button id="sample" class="link-button" type="button">Load a sample contract</button>
+        <button id="clear" class="link-button" type="button">Clear</button>
       </div>
-      <p class="hint" id="status" role="status"></p>
+
+      <p class="status" id="status" role="status" aria-live="polite"></p>
     </section>
 
-    <section class="panel result-panel">
-      <div id="empty" class="empty">
-        <h2>Nothing analysed yet</h2>
+    <section class="report" id="report" aria-labelledby="report-title">
+      <div id="report-empty">
+        <h2 id="report-title">Your redline appears here</h2>
         <p>
-          Your report appears here: every clause that is risky or unfair to you,
-          why it matters, and what to ask for instead.
+          Every clause worth a conversation, marked in the margin beside the exact words that
+          triggered it, with what to ask for.
         </p>
       </div>
 
-      <div id="result" hidden>
-        <div class="score" id="score"></div>
-        <p class="summary" id="summary"></p>
-        <div class="counts" id="counts"></div>
-        <div id="warnings"></div>
-        <ol class="findings" id="findings"></ol>
-
-        <div id="email-block" hidden>
-          <h2>Draft negotiation email</h2>
-          <pre id="email"></pre>
-          <button class="btn ghost" id="copy-email" type="button">Copy</button>
-        </div>
+      <div id="report-body" hidden>
+        <header class="report-head">
+          <p class="verdict" id="verdict"></p>
+          <p class="tally" id="tally"></p>
+          <p class="summary" id="summary"></p>
+          <p class="engine" id="engine"></p>
+        </header>
+        <div class="warnings" id="warnings"></div>
+        <ol class="document" id="document"></ol>
+        <section class="loose" id="loose" hidden aria-labelledby="loose-title">
+          <h2 id="loose-title">Worth a look, not tied to one clause</h2>
+          <div class="loose-marks" id="loose-marks"></div>
+        </section>
       </div>
+    </section>
+
+    <section class="letter" id="letter" hidden aria-labelledby="letter-title">
+      <h2 id="letter-title">Your note to the client</h2>
+      <p class="lede">Warm and specific. Edit it before you send it.</p>
+      <pre id="email"></pre>
+      <button id="copy-email" class="link-button" type="button">Copy the note</button>
     </section>
   </main>
 
   <footer class="footer">
-    <p>Redline runs an open-weight model locally through Ollama. No account, no API key, no upload.</p>
-    <p class="disclaimer">
-      Redline is not a lawyer, and this is not legal advice. It flags clauses worth a conversation.
+    <p>
+      Redline runs an open-weight model locally through Ollama. No account, no API key, no upload —
+      and no webfonts either, so opening this page contacts nobody.
     </p>
+    <p>Redline is not a lawyer, and this is not legal advice. It flags clauses worth a conversation.</p>
   </footer>
 
   <script src="/static/app.js"></script>

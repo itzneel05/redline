@@ -1,177 +1,391 @@
+/* Redline interface.
+ *
+ * Direction: the reviewed document. Findings are red-pen marginalia beside the
+ * clause that triggered them, and the trigger words are underlined inside the
+ * clause. See docs/WEB-DESIGN.md for the brief and the defaults this avoids.
+ *
+ * Fonts are system fonts on purpose: the tool promises that nothing leaves the
+ * machine, so the page must not fetch a font from anyone.
+ */
+
 :root {
-  --paper: #fbfaf7;
-  --ink: #1c1a17;
-  --muted: #6b6459;
-  --line: #e4dfd5;
-  --panel: #ffffff;
-  --red: #c0392b;
-  --red-soft: #fbeae7;
-  --amber: #b9770e;
-  --amber-soft: #fdf3e2;
-  --green: #2e7d5b;
-  --green-soft: #e7f4ee;
-  --accent: #1c1a17;
-  --radius: 12px;
-  --shadow: 0 1px 2px rgba(28, 26, 23, 0.06), 0 8px 24px rgba(28, 26, 23, 0.06);
+  /* The desk, the paper, the ink. */
+  --stock: #e6e6e0;
+  --sheet: #f7f7f4;
+  --sheet-2: #fdfdfb;
+  --ink: #191b21;
+  --ink-soft: #3d4048;
+  --muted: #63666f;
+  --rule: #cdcdc6;
+  --rule-soft: #e0e0da;
+
+  /* The correction pen, and the two other risk levels. */
+  --red: #bf2f26;
+  --amber: #8f6412;
+  --green: #2f6a4c;
+  --hit: #f6e4e0;
+
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+  --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+
+  --measure: 34rem;   /* keeps serif line length under 80 characters */
+  --radius: 3px;
 }
 
-* { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--paper);
+  background: var(--stock);
   color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--sans);
+  font-size: 15px;
   line-height: 1.55;
 }
 
-.visually-hidden {
-  position: absolute; width: 1px; height: 1px;
-  padding: 0; margin: -1px; overflow: hidden;
-  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+.skip:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 10;
+  padding: .5rem .8rem;
+  background: var(--sheet);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
 }
 
-/* Masthead */
-.masthead {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; flex-wrap: wrap;
-  max-width: 1180px; margin: 0 auto; padding: 28px 24px 12px;
-}
-.brand { display: flex; align-items: center; gap: 14px; }
-.brand-mark {
-  display: grid; place-items: center;
-  width: 46px; height: 46px; border-radius: 11px;
-  background: var(--red); color: #fff;
-  font-family: ui-serif, Georgia, "Times New Roman", serif;
-  font-size: 26px; font-weight: 700;
-}
-h1 {
-  margin: 0; font-size: 26px; letter-spacing: -0.02em;
-  font-family: ui-serif, Georgia, "Times New Roman", serif;
-}
-.tagline { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
-
-.local-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 7px 13px; border: 1px solid var(--line); border-radius: 999px;
-  background: var(--panel); color: var(--muted); font-size: 13px; font-weight: 500;
-}
-.local-badge .dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--green);
-  box-shadow: 0 0 0 3px var(--green-soft);
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
-/* Layout */
-.layout {
-  max-width: 1180px; margin: 0 auto; padding: 12px 24px 40px;
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  gap: 22px; align-items: start;
-}
-@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
-
-.panel {
-  background: var(--panel); border: 1px solid var(--line);
-  border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
-}
-.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.panel h2 { margin: 0; font-size: 16px; letter-spacing: -0.01em; }
-.row { display: flex; gap: 8px; }
-
-/* Input */
-textarea {
-  width: 100%; min-height: 340px; margin-top: 14px; padding: 14px;
-  border: 1px solid var(--line); border-radius: 10px; resize: vertical;
-  background: #fefdfb; color: var(--ink);
-  font-family: ui-monospace, SFMono-Regular, "Cascadia Code", Consolas, monospace;
-  font-size: 13px; line-height: 1.6;
-}
-textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-
-.actions { display: flex; align-items: center; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
-.checkbox { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; }
-
-.btn {
-  border: 1px solid var(--line); border-radius: 9px; padding: 10px 16px;
-  background: var(--panel); color: var(--ink); font-size: 14px; font-weight: 600;
-  cursor: pointer; transition: transform 0.05s ease, background 0.15s ease, opacity 0.15s ease;
-}
-.btn:hover { background: #f6f3ee; }
-.btn:active { transform: translateY(1px); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn.primary:hover { background: #333; }
-.btn:disabled { opacity: 0.55; cursor: progress; }
-.btn.ghost { padding: 7px 12px; font-weight: 500; font-size: 13px; }
-
-.hint { min-height: 20px; margin: 12px 0 0; color: var(--muted); font-size: 13px; }
-
-/* Results */
-.empty { color: var(--muted); }
-.empty h2 { color: var(--ink); margin-bottom: 6px; }
-.empty p { margin: 0; font-size: 14px; }
-
-.score {
-  display: inline-block; padding: 8px 14px; border-radius: 9px;
-  font-weight: 700; letter-spacing: 0.01em; font-size: 14px;
-}
-.score.risk-high { background: var(--red-soft); color: var(--red); }
-.score.risk-medium { background: var(--amber-soft); color: var(--amber); }
-.score.risk-low { background: var(--green-soft); color: var(--green); }
-
-.summary { margin: 14px 0 0; font-size: 15px; }
-
-.counts { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-.chip {
-  padding: 4px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
-  border: 1px solid var(--line);
-}
-.chip.risk-high { background: var(--red-soft); color: var(--red); border-color: transparent; }
-.chip.risk-medium { background: var(--amber-soft); color: var(--amber); border-color: transparent; }
-.chip.risk-low { background: var(--green-soft); color: var(--green); border-color: transparent; }
-
-.warning {
-  margin: 14px 0 0; padding: 10px 12px; border-radius: 9px;
-  background: var(--amber-soft); color: #7a5410; font-size: 13px;
-}
-
-.findings { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 12px; }
-.finding {
-  border: 1px solid var(--line); border-left-width: 4px; border-radius: 10px;
-  padding: 14px 16px; background: #fff;
-}
-.finding.risk-high { border-left-color: var(--red); }
-.finding.risk-medium { border-left-color: var(--amber); }
-.finding.risk-low { border-left-color: var(--green); }
-
-.finding-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.finding-head h3 { margin: 0; font-size: 15px; }
-.badge {
-  padding: 2px 9px; border-radius: 999px; font-size: 11.5px;
-  font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
-}
-.badge.risk-high { background: var(--red-soft); color: var(--red); }
-.badge.risk-medium { background: var(--amber-soft); color: var(--amber); }
-.badge.risk-low { background: var(--green-soft); color: var(--green); }
-.category { color: var(--muted); font-size: 12.5px; }
-
-blockquote {
-  margin: 10px 0 0; padding: 8px 12px; border-left: 3px solid var(--line);
-  background: #faf8f4; color: #4a453d; font-size: 13px; font-style: italic;
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-}
-.finding-note { margin: 8px 0 0; font-size: 13.5px; color: #3c3a35; }
-.finding-note strong { color: var(--ink); }
-
-#email-block { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); }
-pre#email {
-  white-space: pre-wrap; word-wrap: break-word; margin: 12px 0;
-  padding: 14px; background: #faf8f4; border: 1px solid var(--line);
-  border-radius: 10px; font-family: inherit; font-size: 13.5px;
-}
-
-/* Footer */
+.topbar,
+main,
 .footer {
-  max-width: 1180px; margin: 0 auto; padding: 4px 24px 44px;
-  color: var(--muted); font-size: 12.5px;
+  max-width: 58rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
 }
-.footer p { margin: 4px 0; }
-.disclaimer { opacity: 0.9; }
+
+/* Masthead: a wordmark with a red rule under it — the one piece of brand. */
+.topbar {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: .25rem 1.5rem;
+  padding-block: 1.9rem 1.1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.wordmark {
+  position: relative;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+.wordmark::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 14%;
+  bottom: -1px;
+  height: 2px;
+  background: var(--red);
+}
+.promise {
+  margin: 0;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+/* Sheets */
+.intake,
+.report,
+.letter {
+  margin-top: 1.75rem;
+  padding: 1.9rem;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+h1 {
+  max-width: 22ch;
+  margin: 0 0 .55rem;
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 1.05rem + 1.9vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+}
+.lede {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: .95rem;
+}
+
+/* Intake */
+.field { display: block; margin-top: 1.6rem; }
+.field-label {
+  display: block;
+  margin-bottom: .45rem;
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 600;
+}
+textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 19rem;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--sheet-2);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.intake-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .6rem 1.4rem;
+  margin-top: 1.3rem;
+}
+.button {
+  padding: .62rem 1.15rem;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.button:hover { background: #000; }
+.button:disabled { opacity: .5; cursor: progress; }
+
+.link-button {
+  padding: .2rem 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: .88rem;
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: .2em;
+  cursor: pointer;
+}
+.link-button:hover { text-decoration-color: var(--red); }
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  color: var(--ink-soft);
+  font-size: .88rem;
+}
+
+.status {
+  min-height: 1.2rem;
+  margin: 1.1rem 0 0;
+  color: var(--muted);
+  font-size: .86rem;
+}
+
+/* Report */
+#report-empty h2 {
+  margin: 0 0 .45rem;
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+#report-empty p {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: .92rem;
+}
+
+.verdict { margin: 0; }
+.verdict strong { font-weight: 700; }
+.risk-word.risk-high { color: var(--red); }
+.risk-word.risk-medium { color: var(--amber); }
+.risk-word.risk-low { color: var(--green); }
+
+.tally {
+  margin: .35rem 0 0;
+  color: var(--ink-soft);
+  font-size: .9rem;
+}
+.summary {
+  max-width: var(--measure);
+  margin: 1rem 0 0;
+  font-family: var(--serif);
+  font-size: 1.06rem;
+  line-height: 1.6;
+}
+.engine {
+  margin: .8rem 0 0;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.warnings { display: grid; gap: .5rem; margin-top: 1.3rem; }
+.warning {
+  margin: 0;
+  padding: .6rem .85rem;
+  border-left: 2px solid var(--amber);
+  background: #f6f1e4;
+  color: var(--ink-soft);
+  font-size: .86rem;
+}
+
+/* The document. Clause text on the left, marks in the margin. */
+.document {
+  margin: 1.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.clause {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 19rem;
+  gap: 0 2.25rem;
+  padding-block: 1.15rem;
+  border-top: 1px solid var(--rule-soft);
+}
+.clause:first-child { border-top: 0; padding-top: .2rem; }
+
+.clause-text {
+  max-width: var(--measure);
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.62;
+}
+.clause-text p { margin: 0; overflow-wrap: anywhere; }
+.clause-heading .clause-text {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+
+/* The trigger words, underlined by the pen. */
+mark.hit {
+  padding-bottom: 1px;
+  background: var(--hit);
+  border-bottom: 2px solid var(--mark, var(--red));
+  color: inherit;
+}
+
+/* Marginalia */
+.marks {
+  display: grid;
+  gap: 1.1rem;
+  align-content: start;
+  padding-left: .9rem;
+  border-left: 2px solid var(--mark, var(--rule));
+}
+.mark { --mark: var(--red); overflow-wrap: anywhere; }
+.mark.risk-medium { --mark: var(--amber); }
+.mark.risk-low { --mark: var(--green); }
+
+.mark-line {
+  margin: 0;
+  color: var(--mark);
+  font-size: .76rem;
+  font-weight: 650;
+  letter-spacing: .01em;
+}
+.mark-cat { color: var(--muted); font-weight: 500; }
+.mark-title {
+  margin: .2rem 0 .35rem;
+  font-size: .96rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+.mark-why,
+.mark-ask {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: .86rem;
+}
+.mark-ask { margin-top: .5rem; }
+.mark-ask strong { color: var(--ink); }
+.mark-quote {
+  margin: .5rem 0 0;
+  padding-left: .7rem;
+  border-left: 2px solid var(--rule);
+  color: var(--muted);
+  font-family: var(--serif);
+  font-size: .92rem;
+}
+
+/* Findings that could not be tied to a clause in the text. */
+.loose { margin-top: 2.2rem; }
+.loose h2 {
+  margin: 0 0 .9rem;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.loose-marks { display: grid; gap: 1.2rem; }
+
+/* Letter */
+.letter h2 {
+  margin: 0 0 .4rem;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.letter pre {
+  max-width: var(--measure);
+  margin: 1.2rem 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+/* One orchestrated arrival: the marks settle in. */
+@media (prefers-reduced-motion: no-preference) {
+  .mark { animation: settle .3s ease-out both; }
+  @keyframes settle {
+    from { opacity: 0; transform: translateY(3px); }
+  }
+}
+
+@media (max-width: 62rem) {
+  .clause { grid-template-columns: minmax(0, 1fr); }
+  .marks { margin-top: .9rem; }
+}
+
+@media (max-width: 34rem) {
+  .intake, .report, .letter { padding: 1.25rem; }
+  .clause { padding-block: 1rem; }
+}
+
+.footer {
+  padding-block: 1.6rem 3rem;
+  color: var(--muted);
+  font-size: .8rem;
+}
+.footer p { max-width: 62ch; margin: .3rem 0; }
+
+/* A redline is meant to be printed and handed over. */
+@media print {
+  body { background: #fff; }
+  .topbar, .intake, .footer, .skip, .link-button { display: none; }
+  .report, .letter { margin-top: 0; border: 0; padding: 0; }
+  mark.hit { border-bottom-color: #000; }
+}

@@ -32,7 +32,7 @@ $ redline samples/unfair-contract.txt --offline
 
 **Overall risk: HIGH** (9 high, 4 medium, 1 low)
 
-Found 14 clause(s) worth a second look: 9 high, 4 medium, 1 low.
+Found 14 clauses worth a second look.
 
 ## 1. 🔴 Broad IP assignment / work for hire  _(high · IP)_
 
@@ -54,6 +54,11 @@ net-90 payment terms, non-compete, extra work at no extra cost, and unlimited re
 
 With a local model loaded it also writes the plain-English overview and picks up risks the patterns
 miss — the screenshot below is that run, in the browser, with Gemma answering over `127.0.0.1`.
+
+The interface shows you the contract itself rather than a list of cards: every finding is written in
+the margin beside the clause that triggered it, and the exact words are underlined the way you would
+mark up a printed page. It is set in system fonts and loads nothing from a CDN, because a tool that
+promises your contract never leaves the machine should not phone a font server on load.
 
 <!-- Screenshot: the local web UI at http://127.0.0.1:8765 with a report rendered -->
 ![Redline web UI](REPLACE_WITH_SCREENSHOT_URL)

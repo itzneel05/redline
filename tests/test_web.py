@@ -44,10 +44,15 @@ def test_index_and_static_are_served(base_url: str) -> None:
     status, body = _get(base_url + "/")
     assert status == 200
     assert b"Redline" in body
+    assert b'id="document"' in body  # the report is rendered as a marked-up document
 
     status, body = _get(base_url + "/static/app.js")
     assert status == 200
-    assert b"analyzeContract" in body
+    assert b"analyseContract" in body
+
+    status, body = _get(base_url + "/static/styles.css")
+    assert status == 200
+    assert b"--red" in body
 
 
 def test_analyze_endpoint_returns_report(base_url: str) -> None:

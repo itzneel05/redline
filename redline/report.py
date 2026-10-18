@@ -52,10 +52,8 @@ def default_summary(counts: dict[str, int]) -> str:
             "Nothing tripped the built-in checks. Read it once more yourself "
             "before you sign anything."
         )
-    return (
-        f"Found {total} clause(s) worth a second look: "
-        f"{counts['high']} high, {counts['medium']} medium, {counts['low']} low."
-    )
+    noun = "clause" if total == 1 else "clauses"
+    return f"Found {total} {noun} worth a second look."
 
 
 @dataclass
