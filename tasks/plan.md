@@ -50,7 +50,7 @@ Delivered as both a CLI and a tiny local web UI.
 
 ### Checkpoint: Complete
 
-- [x] All 39 tests pass; `ruff` clean.
+- [x] All 48 tests pass; `ruff` clean.
 - [x] Offline run produces the expected report on `samples/unfair-contract.txt`.
 - [ ] Human reviews the report UI and captures a screenshot for the submission.
 

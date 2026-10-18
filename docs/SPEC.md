@@ -87,7 +87,7 @@ def scan(text: str) -> list[Finding]:
 
 ## Success criteria (verification)
 
-- [x] 39 tests pass with `python -m pytest`.
+- [x] 48 tests pass with `python -m pytest`.
 - [x] `python -m ruff check .` passes.
 - [x] `redline samples/unfair-contract.txt --offline` produces a report with the expected findings.
 - [x] A model failure produces a warning and a rule-only report, not a traceback.

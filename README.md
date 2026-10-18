@@ -68,6 +68,8 @@ redline-web
 # then open http://127.0.0.1:8765
 ```
 
+Pass `--model` if you pulled something other than the default, e.g. `redline-web --model gemma3:1b`.
+
 ## See it work without a model
 
 The built-in checks run with no model at all, so you can try Redline immediately:
@@ -85,7 +87,7 @@ Found 14 clause(s) worth a second look: 9 high, 4 medium, 1 low.
 
 ## 1. 🔴 Broad IP assignment / work for hire  _(high · IP)_
 
-> …All work shall be considered work for hire and Designer assigns all right, title…
+> …4. INTELLECTUAL PROPERTY All work shall be considered work for hire and Designer assigns all right, title, and interest in all…
 
 **Why it matters:** Transferring everything can stop you reusing your own tools, templates, and style.
 **Ask for:** Assign only the final deliverables; keep ownership of your pre-existing tools and methods.
@@ -123,7 +125,7 @@ Set `REDLINE_MODEL` and `REDLINE_HOST` to change the defaults.
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest        # 39 tests, no network or GPU required
+python -m pytest        # 48 tests, no network or GPU required
 python -m ruff check .
 ```
 
