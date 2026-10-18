@@ -148,8 +148,6 @@ redline/
   static/        the single-page interface
 tests/           pytest suite (fake model; no network)
 samples/         example contracts
-docs/            the spec and the DEV submission draft
-tasks/           the implementation plan and task list
 ```
 
 ## License

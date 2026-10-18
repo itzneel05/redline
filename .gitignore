@@ -19,7 +19,6 @@ htmlcov/
 # Local contracts (never commit a client's confidential document)
 contracts/
 *.contract.txt
-!tests/fixtures/*.txt
 
 # OS / editor
 .DS_Store
