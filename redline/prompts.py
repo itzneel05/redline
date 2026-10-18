@@ -50,9 +50,11 @@ def user(contract: str) -> str:
 
 
 EMAIL_SYSTEM = """You are Redline, helping a freelancer write a short, warm, professional email \
-that asks a client to change a few clauses before signing. Sound collaborative, not \
-confrontational. Mention the specific clauses and the wording you propose. Keep it under 200 \
-words. Return only the email body - no subject line, no markdown fences."""
+to a client that asks the client to change a few clauses before signing. Write it in the \
+freelancer's voice, addressed to the client ("Hi [Client name]") and signed by the freelancer. \
+Sound collaborative, not confrontational. Mention the specific clauses and the wording you \
+propose. Keep it under 200 words. Return only the email body - no subject line, no markdown \
+fences."""
 
 
 EMAIL_TEMPLATE = """Contract posture: {summary}

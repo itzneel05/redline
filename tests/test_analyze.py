@@ -76,6 +76,44 @@ def test_merge_dedupes_by_quote_overlap() -> None:
     assert analyze.merge([rule_finding], [model_finding]) == [rule_finding]
 
 
+def test_merge_dedupes_when_model_names_finding_after_the_clause() -> None:
+    from redline.report import Finding
+
+    rule_finding = Finding(
+        "Broad IP assignment / work for hire",
+        "…All work shall be considered work for hire and Designer assigns all right, "
+        "title, and interest in all intellectual property…",
+        "high",
+        "IP",
+        "w",
+        "c",
+    )
+    model_finding = Finding(
+        "DESIGNER ASSIGNS ALL RIGHT, TITLE, AND INTEREST IN ALL INTELLECTUAL PROPERTY",
+        "A separate passage that does not overlap with the built-in quote.",
+        "high",
+        "IP",
+        "w",
+        "c",
+    )
+    assert analyze.merge([rule_finding], [model_finding]) == [rule_finding]
+
+
+def test_merge_keeps_a_short_distinct_model_clause() -> None:
+    from redline.report import Finding
+
+    rule_finding = Finding(
+        "Broad IP assignment",
+        "…Designer assigns all right, title, and interest…",
+        "high",
+        "IP",
+        "w",
+        "c",
+    )
+    model_finding = Finding("Payment", "net 90 days", "high", "Payment", "w", "c")
+    assert analyze.merge([rule_finding], [model_finding]) == [rule_finding, model_finding]
+
+
 def test_findings_from_model_strips_section_numbers() -> None:
     data = {"findings": [{"clause": "4. INTELLECTUAL PROPERTY", "why": "w"}]}
     assert analyze.findings_from_model(data)[0].clause == "INTELLECTUAL PROPERTY"
@@ -122,5 +160,21 @@ def test_email_bullets_and_draft_email(sample_contract: str) -> None:
     assert bullets and "|" in bullets[0]
 
     email_model = FakeModel(payload=None)
-    email_model.complete = lambda system, user: "  Hi there, a small ask.  "  # type: ignore[method-assign]
+    email_model.complete = lambda system, user, **kwargs: "  Hi there, a small ask.  "  # type: ignore[method-assign]
     assert analyze.draft_email(report, email_model) == "Hi there, a small ask."
+
+
+def test_draft_email_unwraps_json_reply(sample_contract: str) -> None:
+    report = analyze.analyze(sample_contract, model=FakeModel())
+    json_model = FakeModel(payload={"body": "Please can we change clause 2?", "subject": "hi"})
+    assert analyze.draft_email(report, json_model) == "Please can we change clause 2?"
+
+
+def test_email_body_passes_plain_text_through() -> None:
+    assert analyze._email_body("  Hello there.  ") == "Hello there."
+    assert analyze._email_body('{"unexpected": 1}') == '{"unexpected": 1}'
+
+
+def test_email_body_drops_a_subject_line() -> None:
+    raw = "Subject: Checking in\n\nHi Sam, a small ask.\n\nThanks,\nAlex"
+    assert analyze._email_body(raw) == "Hi Sam, a small ask.\n\nThanks,\nAlex"

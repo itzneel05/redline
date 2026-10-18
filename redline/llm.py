@@ -33,7 +33,7 @@ class ModelError(RuntimeError):
 class ChatModel(Protocol):
     """The one method Redline needs from any model."""
 
-    def complete(self, system: str, user: str) -> str:
+    def complete(self, system: str, user: str, *, json_mode: bool = True) -> str:
         ...  # pragma: no cover - protocol definition
 
 
@@ -46,17 +46,18 @@ class OllamaModel:
     temperature: float = 0.1
     timeout: int = 600
 
-    def complete(self, system: str, user: str) -> str:
+    def complete(self, system: str, user: str, *, json_mode: bool = True) -> str:
         payload = {
             "model": self.model,
             "stream": False,
-            "format": "json",
             "options": {"temperature": self.temperature},
             "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
         }
+        if json_mode:
+            payload["format"] = "json"
         request = urllib.request.Request(
             f"{self.host.rstrip('/')}/api/chat",
             data=json.dumps(payload).encode("utf-8"),

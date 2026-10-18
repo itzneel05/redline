@@ -45,6 +45,18 @@ def test_complete_posts_chat_and_returns_content(monkeypatch: pytest.MonkeyPatch
     ]
 
 
+def test_complete_can_skip_json_mode(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict = {}
+
+    def fake_urlopen(request, timeout=None):
+        captured["body"] = json.loads(request.data.decode("utf-8"))
+        return FakeResponse(b'{"message": {"content": "plain text"}}')
+
+    monkeypatch.setattr(llm.urllib.request, "urlopen", fake_urlopen)
+    assert llm.OllamaModel().complete("s", "u", json_mode=False) == "plain text"
+    assert "format" not in captured["body"]
+
+
 def test_complete_strips_trailing_slash_from_host(monkeypatch: pytest.MonkeyPatch) -> None:
     captured = {}
 

@@ -39,7 +39,7 @@ class FakeModel:
     error: Exception | None = None
     calls: list[tuple[str, str]] = field(default_factory=list)
 
-    def complete(self, system: str, user: str) -> str:
+    def complete(self, system: str, user: str, *, json_mode: bool = True) -> str:
         self.calls.append((system, user))
         if self.error is not None:
             raise self.error

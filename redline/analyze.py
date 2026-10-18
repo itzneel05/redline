@@ -86,14 +86,15 @@ def _tokens(text: str) -> set[str]:
     return set(re.findall(r"[a-z0-9]+", text.lower()))
 
 
-def _similar(left: str, right: str, threshold: float = 0.6) -> bool:
+def _similar(left: str, right: str, threshold: float = 0.6, min_tokens: int = 1) -> bool:
     """True when one string's words are mostly contained in the other's.
 
-    The built-in checks quote a padded snippet and the model quotes the whole
-    clause, so a simple set-containment ratio catches the same clause twice.
+    The built-in checks quote a padded snippet while the model may quote the
+    whole clause or name the finding after the clause text, so a simple
+    set-containment ratio catches the same clause reported twice.
     """
     a, b = _tokens(left), _tokens(right)
-    if not a or not b:
+    if len(a) < min_tokens or len(b) < min_tokens:
         return False
     return len(a & b) / min(len(a), len(b)) >= threshold
 
@@ -106,6 +107,7 @@ def merge(primary: list[Finding], secondary: list[Finding]) -> list[Finding]:
             finding.clause.strip().lower() == kept.clause.strip().lower()
             or _similar(finding.clause, kept.clause)
             or _similar(finding.quote, kept.quote)
+            or _similar(finding.clause, kept.quote, min_tokens=3)
             for kept in merged
         ):
             continue
@@ -148,9 +150,41 @@ def email_bullets(report: Report) -> list[str]:
     ]
 
 
+_EMAIL_KEYS = ("body", "email", "text", "message", "content")
+
+
+def _strip_subject(text: str) -> str:
+    """Drop a leading "Subject: ..." line the model adds despite the prompt."""
+    lines = text.splitlines()
+    if lines and lines[0].strip().lower().startswith("subject:"):
+        lines = lines[1:]
+        while lines and not lines[0].strip():
+            lines.pop(0)
+    return "\n".join(lines).strip()
+
+
+def _email_body(raw: str) -> str:
+    """Pull the email text out of a reply, unwrapping JSON the model may add."""
+    text = raw.strip()
+    if text.startswith("{"):
+        try:
+            data = parse_json(text)
+        except ModelOutputError:
+            pass
+        else:
+            for key in _EMAIL_KEYS:
+                value = data.get(key)
+                if isinstance(value, str) and value.strip():
+                    text = value.strip()
+                    break
+    return _strip_subject(text)
+
+
 def draft_email(report: Report, model: ChatModel) -> str:
     """Ask the model for a short negotiation email based on the report."""
-    return model.complete(
+    raw = model.complete(
         prompts.EMAIL_SYSTEM,
         prompts.email_user(report.summary, email_bullets(report)),
-    ).strip()
+        json_mode=False,
+    )
+    return _email_body(raw)

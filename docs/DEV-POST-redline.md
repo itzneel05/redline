@@ -36,24 +36,30 @@ Found 14 clause(s) worth a second look: 9 high, 4 medium, 1 low.
 
 ## 1. 🔴 Broad IP assignment / work for hire  _(high · IP)_
 
-> …All work shall be considered work for hire and Designer assigns all right, title…
+> …4. INTELLECTUAL PROPERTY All work shall be considered work for hire and Designer assigns all right, title, and interest in all…
 
 **Why it matters:** Transferring everything can stop you reusing your own tools, templates, and style.
 **Ask for:** Assign only the final deliverables; keep ownership of your pre-existing tools and methods.
 
-## 2. 🔴 Payment tied to the client getting paid  _(high · Payment)_
+## 5. 🔴 Payment tied to the client getting paid  _(high · Payment)_
 
-> …Payment is contingent upon Client's receipt of payment from its own customers…
+> …3. PAYMENT Payment is contingent upon Client's receipt of payment from its own customers…
 
 **Why it matters:** Your invoice should not depend on a deal you are not part of.
 **Ask for:** Delete it. You are paid for the work, not the client's cash flow.
+
+…12 more findings, covering uncapped liability, approval at the client's sole discretion,
+net-90 payment terms, non-compete, extra work at no extra cost, and unlimited revisions.
 ```
+
+With a local model loaded it also writes the plain-English overview and picks up risks the patterns
+miss — the screenshot below is that run, in the browser, with Gemma answering over `127.0.0.1`.
 
 <!-- Screenshot: the local web UI at http://127.0.0.1:8765 with a report rendered -->
 ![Redline web UI](REPLACE_WITH_SCREENSHOT_URL)
 
-`samples/fair-contract.txt` is a reasonable agreement, and Redline returns a single low finding —
-the governing-law clause. I care about that as much as the scary output: a tool that flags
+`samples/fair-contract.txt` is a reasonable agreement, and Redline returns **LOW** — a single low
+finding, the governing-law clause. I care about that as much as the scary output: a tool that flags
 everything is a tool nobody trusts.
 
 ## Code
