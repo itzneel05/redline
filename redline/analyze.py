@@ -15,7 +15,9 @@ from .llm import ChatModel, ModelError
 from .report import Finding, Report, counts_of, default_summary
 
 _FENCE = re.compile(r"```(?:json)?", re.IGNORECASE)
+_NUMBERING = re.compile(r"^\s*(?:\d+(?:\.\d+)*|[ivxlc]+)[.)]\s+", re.IGNORECASE)
 _MAX_FINDINGS = 12
+_MAX_TEXT = 600
 
 
 class ModelOutputError(ValueError):
@@ -37,10 +39,18 @@ def parse_json(raw: str) -> dict:
     return data
 
 
-def _clean(value: object) -> str:
+def _clean(value: object, limit: int = _MAX_TEXT) -> str:
     if value is None:
         return ""
-    return " ".join(str(value).split())
+    text = " ".join(str(value).split())
+    if len(text) > limit:
+        text = text[: limit - 1].rstrip() + "\u2026"
+    return text
+
+
+def _strip_numbering(name: str) -> str:
+    """Turn "4. INTELLECTUAL PROPERTY" into "INTELLECTUAL PROPERTY"."""
+    return _NUMBERING.sub("", name).strip()
 
 
 def findings_from_model(data: dict) -> list[Finding]:
@@ -52,7 +62,7 @@ def findings_from_model(data: dict) -> list[Finding]:
     for item in raw:
         if not isinstance(item, dict):
             continue
-        clause = _clean(item.get("clause")) or _clean(item.get("title"))
+        clause = _strip_numbering(_clean(item.get("clause")) or _clean(item.get("title")))
         why = _clean(item.get("why")) or _clean(item.get("explanation"))
         if not clause and not why:
             continue
@@ -72,15 +82,34 @@ def findings_from_model(data: dict) -> list[Finding]:
     return findings
 
 
+def _tokens(text: str) -> set[str]:
+    return set(re.findall(r"[a-z0-9]+", text.lower()))
+
+
+def _similar(left: str, right: str, threshold: float = 0.6) -> bool:
+    """True when one string's words are mostly contained in the other's.
+
+    The built-in checks quote a padded snippet and the model quotes the whole
+    clause, so a simple set-containment ratio catches the same clause twice.
+    """
+    a, b = _tokens(left), _tokens(right)
+    if not a or not b:
+        return False
+    return len(a & b) / min(len(a), len(b)) >= threshold
+
+
 def merge(primary: list[Finding], secondary: list[Finding]) -> list[Finding]:
-    """Keep both sources; drop model findings that repeat a built-in one."""
+    """Keep both sources, dropping model findings that repeat a built-in one."""
     merged = list(primary)
-    seen = {f.clause.strip().lower() for f in primary}
     for finding in secondary:
-        key = finding.clause.strip().lower()
-        if key and key not in seen:
-            seen.add(key)
-            merged.append(finding)
+        if any(
+            finding.clause.strip().lower() == kept.clause.strip().lower()
+            or _similar(finding.clause, kept.clause)
+            or _similar(finding.quote, kept.quote)
+            for kept in merged
+        ):
+            continue
+        merged.append(finding)
     return merged
 
 

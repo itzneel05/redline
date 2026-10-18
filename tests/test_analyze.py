@@ -52,6 +52,42 @@ def test_merge_dedupes_by_clause() -> None:
     assert [f.clause for f in merged] == ["Payment terms", "Kill fee"]
 
 
+def test_merge_dedupes_by_quote_overlap() -> None:
+    from redline.report import Finding
+
+    rule_finding = Finding(
+        "Broad IP assignment",
+        "All work shall be considered work for hire and Designer assigns all right, "
+        "title, and interest",
+        "high",
+        "IP",
+        "w",
+        "c",
+    )
+    model_finding = Finding(
+        "4. INTELLECTUAL PROPERTY",
+        "All work shall be considered work for hire and Designer assigns all right, title, and "
+        "interest in all intellectual property to Client, including any pre-existing tools.",
+        "high",
+        "IP",
+        "w",
+        "c",
+    )
+    assert analyze.merge([rule_finding], [model_finding]) == [rule_finding]
+
+
+def test_findings_from_model_strips_section_numbers() -> None:
+    data = {"findings": [{"clause": "4. INTELLECTUAL PROPERTY", "why": "w"}]}
+    assert analyze.findings_from_model(data)[0].clause == "INTELLECTUAL PROPERTY"
+
+
+def test_findings_from_model_truncates_runaway_text() -> None:
+    data = {"findings": [{"clause": "X", "why": "word " * 500}]}
+    finding = analyze.findings_from_model(data)[0]
+    assert len(finding.why) <= analyze._MAX_TEXT
+    assert finding.why.endswith("\u2026")
+
+
 def test_analyze_combines_rules_and_model(sample_contract: str) -> None:
     report = analyze.analyze(sample_contract, model=FakeModel())
     sources = {finding.source for finding in report.findings}

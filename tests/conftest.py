@@ -19,12 +19,12 @@ MODEL_JSON = {
             "counter": "Add a kill fee of 25% if cancelled mid-project.",
         },
         {
-            "clause": "Long pay window",
-            "quote": "net 90 days",
+            "clause": "Unilateral audit rights",
+            "quote": "Client may audit the Designer's records at any time",
             "risk": "critical",
-            "category": "Payment",
-            "why": "Three months is a long time to wait for money you already earned.",
-            "counter": "Ask for net 14.",
+            "category": "Other",
+            "why": "One-sided audit clauses invite fishing expeditions.",
+            "counter": "Ask for reasonable notice and a defined purpose.",
         },
     ],
 }
